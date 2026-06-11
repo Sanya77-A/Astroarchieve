@@ -11,6 +11,7 @@ import Clients from './pages/Clients';
 import ClientProfile from './pages/ClientProfile';
 import Activity from './pages/Activity';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
@@ -31,6 +32,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
       <Route path="/" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
         <Route path="consultations" element={<ConsultationList />} />

@@ -1,26 +1,37 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { MdEmail, MdLock, MdArrowForward } from 'react-icons/md';
+import { MdEmail, MdLock, MdArrowForward, MdPerson } from 'react-icons/md';
 import { FaMicrophone } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
-function Login() {
+function Signup() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      return toast.error('Passwords do not match');
+    }
+    
+    if (password.length < 6) {
+      return toast.error('Password must be at least 6 characters');
+    }
+
     setLoading(true);
     try {
-      await login(email, password);
-      toast.success('Welcome back!');
+      await register(name, email, password);
+      toast.success('Account created successfully!');
       navigate('/');
     } catch (err) {
-      toast.error(err || 'Login failed');
+      toast.error(err || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -58,12 +69,40 @@ function Login() {
           >
             <FaMicrophone className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Consultation Manager</h1>
-          <p className="text-indigo-300 text-sm mt-1">Manage consultations effortlessly.</p>
+          <h1 className="text-2xl font-bold text-white">Create Account</h1>
+          <p className="text-indigo-300 text-sm mt-1">Join Consultation Manager today.</p>
         </div>
 
         {/* Form */}
         <form onSubmit={submitHandler} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-indigo-200 mb-1.5">Full Name</label>
+            <div className="relative">
+              <MdPerson className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-300" />
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="John Doe"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  color: 'white',
+                  borderRadius: '12px',
+                  width: '100%',
+                  padding: '0.75rem 0.875rem 0.75rem 2.5rem',
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                  fontFamily: 'Inter, sans-serif',
+                  transition: 'all 0.2s',
+                }}
+                onFocus={e => { e.target.style.borderColor = 'rgba(167,139,250,0.6)'; e.target.style.background = 'rgba(255,255,255,0.12)'; }}
+                onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.15)'; e.target.style.background = 'rgba(255,255,255,0.08)'; }}
+              />
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-semibold text-indigo-200 mb-1.5">Email Address</label>
             <div className="relative">
@@ -120,6 +159,34 @@ function Login() {
             </div>
           </div>
 
+          <div>
+            <label className="block text-sm font-semibold text-indigo-200 mb-1.5">Confirm Password</label>
+            <div className="relative">
+              <MdLock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-300" />
+              <input
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  color: 'white',
+                  borderRadius: '12px',
+                  width: '100%',
+                  padding: '0.75rem 0.875rem 0.75rem 2.5rem',
+                  fontSize: '0.875rem',
+                  outline: 'none',
+                  fontFamily: 'Inter, sans-serif',
+                  transition: 'all 0.2s',
+                }}
+                onFocus={e => { e.target.style.borderColor = 'rgba(167,139,250,0.6)'; e.target.style.background = 'rgba(255,255,255,0.12)'; }}
+                onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.15)'; e.target.style.background = 'rgba(255,255,255,0.08)'; }}
+              />
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -128,34 +195,23 @@ function Login() {
               background: loading ? 'rgba(79,70,229,0.5)' : 'linear-gradient(135deg, #4f46e5, #4338ca)',
               boxShadow: loading ? 'none' : '0 4px 16px rgba(79,70,229,0.4)',
               cursor: loading ? 'not-allowed' : 'pointer',
-              marginTop: '1rem',
+              marginTop: '1.5rem',
             }}
           >
             {loading ? (
-              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Signing in...</>
+              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Creating account...</>
             ) : (
-              <>Sign in <MdArrowForward className="w-4 h-4" /></>
+              <>Sign Up <MdArrowForward className="w-4 h-4" /></>
             )}
           </button>
         </form>
 
-        {/* Hint */}
-        <div
-          className="mt-6 p-3 rounded-xl text-xs text-center"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
-        >
-          <span className="text-indigo-300">Demo credentials: </span>
-          <span className="text-white font-mono">admin@crm.com</span>
-          <span className="text-indigo-300"> / </span>
-          <span className="text-white font-mono">admin123</span>
-        </div>
-
-        {/* Signup Link */}
+        {/* Login Link */}
         <div className="mt-6 text-center">
           <p className="text-indigo-200 text-sm">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
-              Sign Up
+            Already have an account?{' '}
+            <Link to="/login" className="text-emerald-400 font-semibold hover:text-emerald-300 transition-colors">
+              Sign In
             </Link>
           </p>
         </div>
@@ -164,4 +220,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Signup;

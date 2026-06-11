@@ -28,13 +28,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (name, email, password) => {
+    try {
+      const { data } = await api.post('/auth/register', { name, email, password });
+      setAdmin(data);
+      localStorage.setItem('adminInfo', JSON.stringify(data));
+      return data;
+    } catch (error) {
+      throw error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('adminInfo');
     setAdmin(null);
   };
 
   return (
-    <AuthContext.Provider value={{ admin, login, logout, loading }}>
+    <AuthContext.Provider value={{ admin, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

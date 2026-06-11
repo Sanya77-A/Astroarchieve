@@ -31,4 +31,43 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { loginAdmin };
+const registerAdmin = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Please add all fields' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
+    const adminExists = await Admin.findOne({ email });
+
+    if (adminExists) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+
+    const admin = await Admin.create({
+      name,
+      email,
+      password,
+    });
+
+    if (admin) {
+      res.status(201).json({
+        _id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        token: generateToken(admin._id),
+      });
+    } else {
+      res.status(400).json({ message: 'Invalid user data' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { loginAdmin, registerAdmin };
